@@ -1,0 +1,285 @@
+#-*- coding: utf-8 -*-
+import tkinter
+import math
+import tkinter.messagebox
+
+class calculator:
+    # 界面布局方法
+    def __init__(self):
+        self.root = tkinter.Tk()
+        self.root.minsize(285, 455)
+        # self.root.maxsize(280, 470)
+        self.root.title('计算器')
+        self.result = tkinter.StringVar()
+        self.result.set(0)
+        self.lists = []
+        self.ispresssign = False
+        self.menus()
+        self.layout()
+        self.root.mainloop()
+
+    def menus(self):
+        allmenu = tkinter.Menu(self.root)
+
+        # submenu1
+        filemenu = tkinter.Menu(allmenu, tearoff=0)
+
+        filemenu.add_command(label='标准型', command=self.myfunc)
+        filemenu.add_command(label='科学型', command=self.myfunc)
+        filemenu.add_command(label='程序员', command=self.myfunc)
+        filemenu.add_command(label='日期计算', command=self.myfunc)
+        allmenu.add_cascade(label='查看(V)', menu=filemenu)
+
+        # submenu2
+        editmenu = tkinter.Menu(allmenu, tearoff=0)
+
+        editmenu.add_command(label='复制(C)         Ctrl+C', command=self.myfunc)
+        editmenu.add_command(label='粘贴(V)         Ctrl+V', command=self.myfunc)
+        editmenu.add_separator()  # 分割线
+        submenu = tkinter.Menu(editmenu, tearoff=0)
+        submenu.add_command(label='复制历史记录(I)', command=self.myfunc)
+        submenu.add_command(label='编辑(E)                      F2', command=self.myfunc)
+        submenu.add_command(label='取消编辑(N)              Esc', command=self.myfunc)
+        submenu.add_command(label='清除(L)        Ctrl+Shift+D', command=self.myfunc)
+        editmenu.add_cascade(label='历史记录(H)', menu=submenu)
+        allmenu.add_cascade(label='编辑(E)', menu=editmenu)
+
+        # submenu3
+        helpmenu = tkinter.Menu(allmenu, tearoff=0)
+
+        helpmenu.add_command(label='查看帮助(V)       F1', command=self.myfunc)
+        helpmenu.add_separator()
+        helpmenu.add_command(label='关于计算器(A)', command=self.myfunc)
+        allmenu.add_cascade(label='帮助(H)', menu=helpmenu)
+
+        self.root.config(menu=allmenu)
+
+    def layout(self):
+        # Label
+        result = tkinter.StringVar()
+        result.set(0)
+        show_label = tkinter.Label(self.root, bd=3, bg='white', font=('宋体', 30), anchor='se', textvariable=self.result)
+        show_label.place(x=5, y=10, width=275, height=100, anchor='nw')
+
+        # %
+        button_remainder = tkinter.Button(self.root, text='%', command=self.percentage)
+        button_remainder.bind('<Enter>', lambda event: self.enter_butt(button_remainder))
+        button_remainder.place(x=5, y=120, width=65, height=50)
+        # CE
+        button_ce = tkinter.Button(self.root, text='CE', command=lambda: self.result.set(0))
+        button_ce.bind('<Enter>', lambda event: self.enter_butt(button_ce))
+        button_ce.place(x=75, y=120, width=65, height=50)
+        # C
+        button_c = tkinter.Button(self.root, text='C', command=self.clear)
+        button_c.bind('<Enter>', lambda event: self.enter_butt(button_c))
+        button_c.place(x=145, y=120, width=65, height=50)
+        # ←
+        button_back = tkinter.Button(self.root, text='←', command=self.dele_one)
+        button_back.bind('<Enter>', lambda event: self.enter_butt(button_back))
+        button_back.place(x=215, y=120, width=65, height=50)
+
+        # 1/x
+        button_reciprocal = tkinter.Button(self.root, text='1/x', command=self.ds)
+        button_reciprocal.bind('<Enter>', lambda event: self.enter_butt(button_reciprocal))
+        button_reciprocal.place(x=5, y=175, width=65, height=50)
+        # X2
+        button_square = tkinter.Button(self.root, text='x2', command=self.sq)
+        button_square.bind('<Enter>', lambda event: self.enter_butt(button_square))
+        button_square.place(x=75, y=175, width=65, height=50)
+        # √
+        button_sqrt = tkinter.Button(self.root, text='√', command=self.sqrt)
+        button_sqrt.bind('<Enter>', lambda event: self.enter_butt(button_sqrt))
+        button_sqrt.place(x=145, y=175, width=65, height=50)
+        # ÷
+        button_division = tkinter.Button(self.root, text='÷', command=lambda: self.presscal_culate('/'))
+        button_division.bind('<Enter>', lambda event: self.enter_butt(button_division))
+        button_division.place(x=215, y=175, width=65, height=50)
+
+        # 7
+        button_7 = tkinter.Button(self.root, text='7', command=lambda: self.press_num('7'))
+        button_7.bind('<Enter>', lambda event: self.enter_butt(button_7))
+        button_7.place(x=5, y=230, width=65, height=50)
+        # 8
+        button_8 = tkinter.Button(self.root, text='8', command=lambda: self.press_num('8'))
+        button_8.bind('<Enter>', lambda event: self.enter_butt(button_8))
+        button_8.place(x=75, y=230, width=65, height=50)
+        # 9
+        button_9 = tkinter.Button(self.root, text='9', command=lambda: self.press_num('9'))
+        button_9.bind('<Enter>', lambda event: self.enter_butt(button_9))
+        button_9.place(x=145, y=230, width=65, height=50)
+        # *
+        button_multiplication = tkinter.Button(self.root, text='*', command=lambda: self.presscal_culate('*'))
+        button_multiplication.bind('<Enter>', lambda event: self.enter_butt(button_multiplication))
+        button_multiplication.place(x=215, y=230, width=65, height=50)
+
+        # 4
+        button_4 = tkinter.Button(self.root, text='4', command=lambda: self.press_num('4'))
+        button_4.bind('<Enter>', lambda event: self.enter_butt(button_4))
+        button_4.place(x=5, y=285, width=65, height=50)
+        # 5
+        button_5 = tkinter.Button(self.root, text='5', command=lambda: self.press_num('5'))
+        button_5.bind('<Enter>', lambda event: self.enter_butt(button_5))
+        button_5.place(x=75, y=285, width=65, height=50)
+        # 6
+        button_6 = tkinter.Button(self.root, text='6', command=lambda: self.press_num('6'))
+        button_6.bind('<Enter>', lambda event: self.enter_butt(button_6))
+        button_6.place(x=145, y=285, width=65, height=50)
+        # -
+        button_subtraction = tkinter.Button(self.root, text='-', command=lambda: self.presscal_culate('-'))
+        button_subtraction.bind('<Enter>', lambda event: self.enter_butt(button_subtraction))
+        button_subtraction.place(x=215, y=285, width=65, height=50)
+
+        # 1
+        button_1 = tkinter.Button(self.root, text='1', command=lambda: self.press_num('1'))
+        button_1.bind('<Enter>', lambda event: self.enter_butt(button_1))
+        button_1.place(x=5, y=340, width=65, height=50)
+        # 2
+        button_2 = tkinter.Button(self.root, text='2', command=lambda: self.press_num('2'))
+        button_2.bind('<Enter>', lambda event: self.enter_butt(button_2))
+        button_2.place(x=75, y=340, width=65, height=50)
+        # 3
+        button_3 = tkinter.Button(self.root, text='3', command=lambda: self.press_num('3'))
+        button_3.bind('<Enter>', lambda event: self.enter_butt(button_3))
+        button_3.place(x=145, y=340, width=65, height=50)
+        # +
+        button_plus = tkinter.Button(self.root, text='+', command=lambda: self.presscal_culate('+'))
+        button_plus.bind('<Enter>', lambda event: self.enter_butt(button_plus))
+        button_plus.place(x=215, y=340, width=65, height=50)
+
+        # ±
+        button_zf = tkinter.Button(self.root, text='±', command=self.zf)
+        button_zf.bind('<Enter>', lambda event: self.enter_butt(button_zf))
+        button_zf.place(x=5, y=395, width=65, height=50)
+        # 0
+        button_0 = tkinter.Button(self.root, text='0', command=lambda: self.press_num('0'))
+        button_0.bind('<Enter>', lambda event: self.enter_butt(button_0))
+        button_0.place(x=75, y=395, width=65, height=50)
+        # .
+        button_point = tkinter.Button(self.root, text='.', command=lambda: self.press_num('.'))
+        button_point.bind('<Enter>', lambda event: self.enter_butt(button_point))
+        button_point.place(x=145, y=395, width=65, height=50)
+        # =
+        button_equal = tkinter.Button(self.root, text='=', command=lambda: self.press_equal())
+        button_equal.bind('<Enter>', lambda event: self.enter_butt(button_equal))
+        button_equal.place(x=215, y=395, width=65, height=50)
+
+    def myfunc(self):
+        tkinter.messagebox.showinfo('','只是装饰而已～')
+
+    def leave_butt(self, button):
+        button.config(relief='raised')
+
+    def enter_butt(self, button):
+        button.config(relief='groove')
+        button.bind("<Leave>", lambda event: self.leave_butt(button))
+
+    # num
+    def press_num(self, num):
+        if not self.ispresssign:
+            pass
+        else:
+            self.result.set(0)
+            self.ispresssign = False
+        if num == '.':
+            num = '0.'
+
+        oldnum = self.result.get()
+
+        if oldnum == '0':
+            self.result.set(num)
+        else:
+            newnum = oldnum + num
+            self.result.set(newnum)
+
+    # + - * ÷
+    def presscal_culate(self,sign):
+        num = self.result.get()
+        self.lists.append(num)
+        self.lists.append(sign)
+        self.ispresssign = True
+
+    # =
+    def press_equal(self):
+        curnum = self.result.get()
+        self.lists.append(curnum)
+        calculatestr = ''.join(self.lists)
+        if calculatestr[-2:] == "/0":
+            self.result.set('除数不能为0')
+            self.lists = []
+            self.ispresssign = True
+            return
+        endnum = eval(calculatestr)
+        # 将运算结果显示在界面中
+        self.result.set(str(endnum)[:10])
+        if self.lists != 0:
+            self.ispresssign = True
+        self.lists = []
+
+    # %
+    def percentage(self):
+        num = int(self.result.get())
+        pernum = float(num) / 100
+        self.result.set(str(pernum)[:100])
+
+    # 1/x
+    def ds(self):
+        num = int(self.result.get())
+        if num == 0:
+            self.result.set('除数不能为0')
+            self.ispresssign = True
+        else:
+            dsnum = 1 / num
+            self.result.set(str(dsnum)[:100])
+            if self.lists != 0:
+                self.ispresssign = True
+        self.lists = []
+
+    # x2
+    def sq(self):
+        num = int(self.result.get())
+        sqnum = num * num
+        self.result.set(str(sqnum)[:100])
+        if self.lists != 0:
+            self.ispresssign = True
+        self.lists = []
+
+    # √
+    def sqrt(self):
+        num = int(self.result.get())
+        sqrtnum = math.sqrt(num)
+        if str(sqrtnum)[-1] == '0':
+            self.result.set(str(sqrtnum)[:-2])
+        else:
+            self.result.set(str(sqrtnum)[:10])
+        if self.lists != 0:
+            self.ispresssign = True
+        self.lists = []
+
+    # CE
+    def clear(self):
+        self.lists = []
+        self.result.set(0)
+
+    # ←
+    def dele_one(self):
+        if self.result.get() == '' or self.result.get() == '0':
+            self.result.set('0')
+            return
+        else:
+            num = len(self.result.get())
+            if num > 1:
+                strnum = self.result.get()
+                strnum = strnum[0:num - 1]
+                self.result.set(strnum)
+            else:
+                self.result.set('0')
+
+    # ±
+    def zf(self):
+        strnum = self.result.get()
+        if strnum[0] == '-':
+            self.result.set(strnum[1:])
+        elif strnum[0] != '-' and strnum != '0':
+            self.result.set('-' + strnum)
+
+mycalculator = calculator()
